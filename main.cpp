@@ -99,7 +99,6 @@ private:
         std::string response = "'batteryStringVoltage'=42.6V;;36:45 'batteryVoltage1'=14.22V;;12:15.25 'batteryVoltage2'=14.16V;;12:15.25 'batteryVoltage3'=14.25V;;12:15.25";
 
 
-
         return "";
     }
 
@@ -129,6 +128,11 @@ private:
 
 };
 
+/*
+ *
+ * 'batteryStringVoltage'=42V;;36:45 'batteryVoltage1'=13.98V;;12:15.25 'batteryVoltage2'=14.01V;;12:15.25 'batteryVoltage3'=14V;;12:15.25
+ *
+ * */
 
 int main() {
     std::string libPath = "/usr/share/poller/";
