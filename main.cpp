@@ -5,9 +5,7 @@
 #include <memory>
 #include <stdexcept>
 #include <regex>
-#include <map>
 #include <cstring>
-#include <unordered_map>
 
 
 // SNMP Test
@@ -21,8 +19,8 @@ public:
 
     // Prototyping constructor
     // Input Param 1: Host
-    // Opt Input Param 2: Community
-    // Opt Input Param 3: Version
+    // Input Param 2: Community
+    // Input Param 3: Version
     Snmp(std::string host_str, std::string community_str = "", std::string version_str = "") {
         this->host = host_str;
         this->community = community_str;
@@ -71,14 +69,14 @@ public:
 private:
 
     // Return true if error strings are found in the response, else return false
-    bool errorsPresent(std::string response = "CHANGE THIS"){
-        for (int i = 0; i < this->SNMP_ERRORS->length(); i++)
+    bool errorsPresent(std::string response){
+        /*for (int i = 0; i < this->SNMP_ERRORS->length(); i++)
         {
             if (response.find(this->SNMP_ERRORS[i])) {
                 std::cout << "Response: " << response << std::endl;
                 return true;
             }
-        }
+        }*/
         return false;
     }
 
@@ -87,16 +85,66 @@ private:
         std::string command_str = method + " " + this->SNMP_GET_OPTS + " -c " +
                 community + " -v " + version + " " + host + " " + oid + " 2>&1";
 
-        std::cout << command_str << std::endl;
+        std::cout << command_str << std::endl << std::endl;
 
-        /*char command_arr[command_str.length() + 1];
+        char command_arr[command_str.length() + 1];
         strcpy(command_arr, command_str.c_str());
 
         std::string response = exec(command_arr);
+        // std::string response = "'batteryStringVoltage'=42.6V;;36:45 'batteryVoltage1'=14.22V;;12:15.25 'batteryVoltage2'=14.16V;;12:15.25 'batteryVoltage3'=14.25V;;12:15.25";
 
-        std::cout << response << std::endl;*/
+        if (errorsPresent(response)) { /* do something about it*/ }
+        // std::cout << response << std::endl << std::endl;
 
-        std::string response = "'batteryStringVoltage'=42.6V;;36:45 'batteryVoltage1'=14.22V;;12:15.25 'batteryVoltage2'=14.16V;;12:15.25 'batteryVoltage3'=14.25V;;12:15.25";
+        std::istringstream iss(response);
+        std::vector<std::string> res;
+        std::string temp;
+        char delim = ' '; // whatever you want
+        while (getline(iss, temp, delim)) {
+            if (!(temp.empty())) {
+                res.push_back(temp);
+
+                int start_value_pos = temp.find_first_of('=') + 1;
+                std::string key = temp.substr(1, start_value_pos-3);
+
+                std::string value_raw = temp.substr(start_value_pos);
+
+                // declaring character array
+                char value_char_arr[value_raw.length() + 1];
+                strcpy(value_char_arr, value_raw.c_str());
+
+                std::vector<std::string> values;
+                std::string temp_str;
+
+                /*for (const auto &i : value_char_arr) {
+                    std::cout << i ;
+                }*/
+
+                int i = 0;
+                int array_len = sizeof(value_char_arr) / sizeof(value_char_arr[0]);
+                while(i < array_len) {
+
+                    if (value_char_arr[i] == ';' || value_char_arr[i] == ':') {
+                        values.push_back(temp_str);
+                        temp_str.clear();
+                    } else {
+
+                        temp_str += value_char_arr[i];
+                        if (i == array_len - 1) {
+                            values.push_back(temp_str);
+                        }
+
+                    }
+                    i++;
+                }
+
+                for (const auto &x : values) {
+                    std::cout << key << " - " << x << std::endl;
+                }
+
+            }
+        }
+
 
 
         return "";
@@ -106,7 +154,7 @@ private:
         std::array<char, 128> buffer;
         std::string result;
         std::unique_ptr<FILE, decltype(&pclose)> pipe(popen(cmd, "r"), pclose);
-        if (!pipe) { throw std::runtime_error("popen() failed!"); }
+        if (!pipe)  throw std::runtime_error("popen() failed!");
         while (fgets(buffer.data(), buffer.size(), pipe.get()) != nullptr) {
             result += buffer.data();
         }
@@ -134,13 +182,17 @@ private:
  *
  * */
 
-int main() {
+int main(int argc, char* argv[]) {
     std::string libPath = "/usr/share/poller/";
 
-    Snmp snmp = *new Snmp("dhcp-0-b-c9-71-8-ad.modem.eaglecable.net", "eagle", "2c");
+    std::string addr = argv[1];
+    std::string community = argv[2];
+    std::string version = argv[3];
+
+    Snmp snmp = *new Snmp(addr, community, version);
 
     std::cout << snmp.getHost() << " - " << snmp.getCommunity() << " - " << snmp.getVersion() << std::endl;
-    std::cout << snmp.get(".1.3.6.1.4.1.5591.1.4.2.1.9", snmp.getCommunity(), snmp.getVersion());
+    std::cout << snmp.get(".1.3.6.1.4.1.5591.1.4.4.1.4", snmp.getCommunity(), snmp.getVersion());
 
 
     return 0;

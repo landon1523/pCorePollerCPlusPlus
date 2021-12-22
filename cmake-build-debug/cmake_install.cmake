@@ -1,4 +1,4 @@
-# Install script for directory: C:/Users/Landon/CLionProjects/pCorePollerCPlusPlus
+# Install script for directory: C:/Users/lando/CLionProjects/pCorePollerCPlusPlus
 
 # Set the install prefix
 if(NOT DEFINED CMAKE_INSTALL_PREFIX)
@@ -45,5 +45,5 @@ endif()
 
 string(REPLACE ";" "\n" CMAKE_INSTALL_MANIFEST_CONTENT
        "${CMAKE_INSTALL_MANIFEST_FILES}")
-file(WRITE "C:/Users/Landon/CLionProjects/pCorePollerCPlusPlus/cmake-build-debug/${CMAKE_INSTALL_MANIFEST}"
+file(WRITE "C:/Users/lando/CLionProjects/pCorePollerCPlusPlus/cmake-build-debug/${CMAKE_INSTALL_MANIFEST}"
      "${CMAKE_INSTALL_MANIFEST_CONTENT}")
