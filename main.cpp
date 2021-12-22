@@ -99,7 +99,7 @@ private:
         std::istringstream iss(response);
         std::vector<std::string> res;
         std::string temp;
-        char delim = ' '; // whatever you want
+        char delim = ' ';
         while (getline(iss, temp, delim)) {
             if (!(temp.empty())) {
                 res.push_back(temp);
